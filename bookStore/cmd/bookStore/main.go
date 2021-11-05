@@ -2,8 +2,8 @@ package main
 
 import (
 	_ "bookStore/internal/store"
+	"bookStore/server"
 	"bookStore/store/factory"
-	"bookstore/server"
 	"context"
 	"log"
 	"os"
@@ -20,7 +20,7 @@ func main() {
 
 	service := server.NewBookStoreServer(":8080", s)
 
-	errChan, err = service.ListenAndServe()
+	errChan, err := service.ListenAndServe()
 	if err != nil {
 		log.Println("Web server start failed: ", err)
 		return

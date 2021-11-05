@@ -1,11 +1,9 @@
 package middleware
 
 import (
-	_ "bookStore/server/server"
 	"log"
 	"mime"
 	"net/http"
-	"time"
 )
 
 func Logging(next http.Handler) http.Handler {
@@ -29,20 +27,4 @@ func Validating(next http.Handler) http.Handler {
 		}
 		next.ServeHTTP(w, req)
 	})
-}
-
-func (bs *BookStoreServer) ListenAndServe() (<-chan error, error) {
-	var err error
-	errChan := make(chan error)
-	go func() {
-		err = bs.srv.ListenAndServe()
-		errChan <- err
-	}()
-
-	select{
-	case err = <-errChan:
-		return nil, err
-	case <-time.After(time.Second):
-		return errChan, nil
-	}
 }

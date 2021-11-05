@@ -3,13 +3,15 @@ package server
 import (
 	"bookStore/server/middleware"
 	"bookStore/store"
+	"context"
 	"encoding/json"
 	"github.com/gorilla/mux"
 	"net/http"
+	"time"
 )
 
 type BookStoreServer struct {
-	s store.Store
+	s   store.Store
 	srv *http.Server
 }
 
@@ -23,20 +25,40 @@ func NewBookStoreServer(addr string, s store.Store) *BookStoreServer {
 
 	router := mux.NewRouter()
 	router.HandleFunc("/book", srv.createBookHandler).Methods("POST")
-	router.HandleFunc("/book/{id}", srv.updateBookHandler).Methods("POST")
+	//router.HandleFunc("/book/{id}", srv.updateBookHandler).Methods("POST")
 	router.HandleFunc("/book/{id}", srv.getBookHandler).Methods("GET")
 	router.HandleFunc("/book", srv.getAllBooksHandler).Methods("GET")
-	router.HandleFunc("/book/{id}", srv.delBookHandler).Methods("DELETE")
+	//router.HandleFunc("/book/{id}", srv.delBookHandler).Methods("DELETE")
 
 	srv.srv.Handler = middleware.Logging(middleware.Validating(router))
 	return srv
+}
+
+func (bs *BookStoreServer) ListenAndServe() (<-chan error, error) {
+	var err error
+	errChan := make(chan error)
+	go func() {
+		err = bs.srv.ListenAndServe()
+		errChan <- err
+	}()
+
+	select {
+	case err = <-errChan:
+		return nil, err
+	case <-time.After(time.Second):
+		return errChan, nil
+	}
+}
+
+func (bs *BookStoreServer) Shutdown(ctx context.Context) error {
+	return bs.srv.Shutdown(ctx)
 }
 
 func (bs *BookStoreServer) createBookHandler(w http.ResponseWriter, req *http.Request) {
 	dec := json.NewDecoder(req.Body)
 	var book store.Book
 	if err := dec.Decode(&book); err != nil {
-		http.Error(w, error.Error(), http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	if err := bs.s.Create(&book); err != nil {
@@ -48,7 +70,7 @@ func (bs *BookStoreServer) createBookHandler(w http.ResponseWriter, req *http.Re
 func (bs *BookStoreServer) getBookHandler(w http.ResponseWriter, req *http.Request) {
 	id, ok := mux.Vars(req)["id"]
 	if !ok {
-		http.Error(w ,"no id found in request", http.StatusBadRequest)
+		http.Error(w, "no id found in request", http.StatusBadRequest)
 		return
 	}
 	book, err := bs.s.Get(id)
@@ -59,12 +81,22 @@ func (bs *BookStoreServer) getBookHandler(w http.ResponseWriter, req *http.Reque
 	response(w, book)
 }
 
+func (bs *BookStoreServer) getAllBooksHandler(w http.ResponseWriter, req *http.Request) {
+	books, err := bs.s.GetAll()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	response(w, books)
+}
+
 func response(w http.ResponseWriter, v interface{}) {
 	data, err := json.Marshal(v)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	w.Header().set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json")
 	w.Write(data)
 }

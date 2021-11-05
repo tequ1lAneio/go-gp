@@ -12,7 +12,7 @@ var (
 )
 
 func Register(name string, p store.Store) {
-	providersMu.lock()
+	providersMu.Lock()
 	defer providersMu.Unlock()
 	if p == nil {
 		panic("store: Register provider is nil")
