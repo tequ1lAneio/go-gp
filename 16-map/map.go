@@ -32,7 +32,15 @@ func defineMaps() {
 	m6 := make(map[int]string)
 	m7 := make(map[int]string, 5)
 
-	fmt.Println(m1, m2, m3, m4)
+	fmt.Println(m1, m2, m3, m4, m5, m6, m7)
+}
+
+func length() {
+	m := map[string]int {
+		"key1": 2,
+		"key2": 4,
+	}
+	fmt.Println(len(m))
 }
 
 func addKey() {
@@ -49,6 +57,19 @@ func addKey() {
 	m2["key3"] = 666
 }
 
+func accessValue()  {
+	m1 := make(map[string]int)
+	v1 := m1["key"]
+
+	m2 := make(map[string]int)
+	v2, ok := m2["key"]
+	//_, ok := m2["key"] // simply use "_" when we don't care about the value
+
+	if !ok {}
+
+	fmt.Println(v1, v2)
+}
+
 func compareTypes() {
 	s1 := make([]int, 1)
 	s2 := make([]int, 2)
@@ -63,5 +84,7 @@ func compareTypes() {
 }
 
 func main() {
-	defineMaps()
+	//defineMaps()
+	//length()
+	accessValue()
 }
