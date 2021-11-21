@@ -57,7 +57,7 @@ func addKey() {
 	m2["key3"] = 666
 }
 
-func accessValue()  {
+func accessValue() {
 	m1 := make(map[string]int)
 	v1 := m1["key"]
 
@@ -68,6 +68,30 @@ func accessValue()  {
 	if !ok {}
 
 	fmt.Println(v1, v2)
+}
+
+func deleteValue() {
+	m := map[string]int{
+		"key1": 1,
+		"key2": 2,
+	}
+
+	delete(m, "key2")
+	fmt.Println(m)
+}
+
+func iterateMap() {
+	m := map[int]int{
+		1: 11,
+		2: 22,
+		3: 33,
+	}
+
+	fmt.Printf("{ ")
+	for k, v := range m {
+		fmt.Printf("[%d, %d] ", k, v)
+	}
+	fmt.Printf("}\n")
 }
 
 func compareTypes() {
@@ -83,8 +107,23 @@ func compareTypes() {
 	fmt.Println(s1, s2, f1(), f2(), m1, m2)
 }
 
+func modify(m map[string]int) {
+	m["key1"] = 4
+	m["key2"] = 8
+}
+
 func main() {
 	//defineMaps()
 	//length()
-	accessValue()
+	//accessValue()
+	//deleteValue()
+	iterateMap()
+
+	m := map[string]int{
+		"key1": 1,
+		"key2": 2,
+	}
+	fmt.Println(m)
+	modify(m)
+	fmt.Println(m)
 }
