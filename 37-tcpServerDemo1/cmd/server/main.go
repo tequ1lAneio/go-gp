@@ -2,19 +2,11 @@ package main
 
 import (
 	"fmt"
+	"github.com/tequ1lAneio/tcpServerDemo1/frame"
 	"github.com/tequ1lAneio/tcpServerDemo1/packet"
 	"net"
 )
 
-const (
-	CommandConn   = iota + 0x01 // 0x01
-	CommandSubmit               // 0x02
-)
-
-const (
-	CommandConnAck   = iota + 0x80 // 0x81
-	CommandSubmitAck               // 0x82
-)
 
 func handlePacket(framePayload []byte) (ackFramePayload []byte, err error) {
 	var p packet.Packet

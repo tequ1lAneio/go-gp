@@ -5,6 +5,16 @@ import (
 	"fmt"
 )
 
+const (
+	CommandConn   = iota + 0x01 // 0x01
+	CommandSubmit               // 0x02
+)
+
+const (
+	CommandConnAck   = iota + 0x80 // 0x81
+	CommandSubmitAck               // 0x82
+)
+
 func Decode(packet []byte) (Packet, error) {
 	commandId := packet[0]
 	pktBody := packet[1:]
